@@ -8,5 +8,9 @@ export class SearchTravelDTO
 
   @IsOptional()
   @IsISO8601()
-  date: string
+  startDate: string
+
+  @IsOptional()
+  @IsISO8601()
+  endDate: string
 }
