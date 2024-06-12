@@ -3,6 +3,7 @@ import { JWTPayloadInterface } from 'src/auth/entities/jwt-payload.interface';
 import { CreateTravelDTO } from './dto/create-travel.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateTravelDTO } from './dto/update-travel.dto';
+import { SearchTravelDTO } from './dto/search-travel.dto';
 
 @Injectable()
 export class TravelsService
@@ -28,10 +29,16 @@ export class TravelsService
     return travel;
   }
 
-  async get_user_travels( user: JWTPayloadInterface )
+  async get_user_travels( user: JWTPayloadInterface, filter_dto: SearchTravelDTO )
   {
     const travels = await this.prisma.travel.findMany({ 
-      where: { userId: user.sub }, 
+      where: { 
+        userId: user.sub, 
+        OR: [
+          { description: { contains: filter_dto.search, mode: 'insensitive' } },
+          { name: { contains: filter_dto.search, mode: 'insensitive' } }
+        ]
+      },
       select: { id: true, name:true, description: true, startDate: true, endDate: true } 
     });
 
