@@ -3,6 +3,7 @@ import { JWTPayloadInterface } from 'src/auth/entities/jwt-payload.interface';
 import { CreateTravelDTO } from './dto/create-travel.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NotFoundError } from 'rxjs';
+import { UpdateTravelDTO } from './dto/update-travel.dto';
 
 @Injectable()
 export class TravelsService
@@ -13,13 +14,9 @@ export class TravelsService
   async create_travel( user: JWTPayloadInterface, create_travel_dto: CreateTravelDTO )
   {
     const { startDate, endDate } = create_travel_dto;
-    
-    const iso_datetime_regex = /^(\d{4})-(\d{2})-(\d{2})[T](\d{2}):(\d{2}):(\d{2})(\.\d+)?(Z|([+-]\d{2}:\d{2}))$/;
-    
-    if ( !iso_datetime_regex.test( startDate ) || !iso_datetime_regex.test( endDate ) )
-    {
-      throw new BadRequestException(`Dates should be in YYYY-MM-DDTHH:MM:SS.sssZ format. Example: 2024-06-12T14:30:00Z`)
-    }
+
+    this.check_valid_isodatetime( startDate );
+    this.check_valid_isodatetime( endDate );
 
     const travel = await this.prisma.travel.create({
       data: {
@@ -57,5 +54,40 @@ export class TravelsService
 
     this.logger.verbose(`User ${user.name} requested travel of id ${id}`);
     return travel;
+  }
+
+  async update_travel( user: JWTPayloadInterface, id: string, update_travel_dto: UpdateTravelDTO )
+  {
+    if ( update_travel_dto?.startDate )
+      this.check_valid_isodatetime( update_travel_dto?.startDate );
+    if ( update_travel_dto?.endDate )
+      this.check_valid_isodatetime( update_travel_dto?.endDate );
+    
+    let travel;
+    try
+    {
+      travel = await this.prisma.travel.update({
+        where: { userId: user.sub, id },
+        data: update_travel_dto
+      });
+    }
+    catch ( error )
+    {
+      throw new NotFoundException("We couldn't find this travel");
+    }
+  
+
+    this.logger.verbose(`User ${user.name} updated travel: ${id}. Data: ${JSON.stringify(update_travel_dto)}`);
+    return travel;
+  }
+
+  private check_valid_isodatetime( start_date: string )
+  {
+    const iso_datetime_regex = /^(\d{4})-(\d{2})-(\d{2})[T](\d{2}):(\d{2}):(\d{2})(\.\d+)?(Z|([+-]\d{2}:\d{2}))$/;
+    
+    if ( !iso_datetime_regex.test( start_date ) )
+    {
+      throw new BadRequestException(`Dates should be in YYYY-MM-DDTHH:MM:SS.sssZ format. Example: 2024-06-12T14:30:00Z`)
+    }
   }
 }
