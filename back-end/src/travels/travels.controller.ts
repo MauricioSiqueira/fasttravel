@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { GetUser } from 'src/auth/decorators/get_user.decorator';
 import { JWTPayloadInterface } from 'src/auth/entities/jwt-payload.interface';
 import { TravelsService } from './travels.service';
@@ -13,5 +13,11 @@ export class TravelsController
   create_travel( @GetUser() user: JWTPayloadInterface, @Body() create_travel_dto: CreateTravelDTO )
   {
     return this.travel_service.create_travel( user, create_travel_dto );
+  }
+
+  @Get()
+  get_user_travels( @GetUser() user: JWTPayloadInterface )
+  {
+    return this.travel_service.get_user_travels( user );
   }
 }

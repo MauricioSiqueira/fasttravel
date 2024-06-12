@@ -30,4 +30,15 @@ export class TravelsService
     this.logger.verbose(`User ${user.name} will travel!\nData: ${JSON.stringify(create_travel_dto)}`);
     return travel;
   }
+
+  async get_user_travels( user: JWTPayloadInterface )
+  {
+    const travels = this.prisma.travel.findMany({ 
+      where: { userId: user.sub }, 
+      select: { id: true, name:true, description: true, startDate: true, endDate: true } 
+    });
+
+    this.logger.verbose(`User ${user.name} requested own travels`);
+    return travels;
+  }
 }
