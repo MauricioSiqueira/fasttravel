@@ -1,7 +1,8 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { JWTPayloadInterface } from 'src/auth/entities/jwt-payload.interface';
 import { CreateTravelDTO } from './dto/create-travel.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { NotFoundError } from 'rxjs';
 
 @Injectable()
 export class TravelsService
@@ -33,12 +34,28 @@ export class TravelsService
 
   async get_user_travels( user: JWTPayloadInterface )
   {
-    const travels = this.prisma.travel.findMany({ 
+    const travels = await this.prisma.travel.findMany({ 
       where: { userId: user.sub }, 
       select: { id: true, name:true, description: true, startDate: true, endDate: true } 
     });
 
     this.logger.verbose(`User ${user.name} requested own travels`);
     return travels;
+  }
+
+  async get_travel_by_id( user: JWTPayloadInterface, id: string )
+  {
+    const travel = await this.prisma.travel.findUnique({ 
+      where: { userId: user.sub, id }, 
+      select: { id: true, name:true, description: true, startDate: true, endDate: true } 
+    });
+
+    if ( !travel )
+    {
+      throw new NotFoundException(`We couldn't find your trip`);
+    }
+
+    this.logger.verbose(`User ${user.name} requested travel of id ${id}`);
+    return travel;
   }
 }
