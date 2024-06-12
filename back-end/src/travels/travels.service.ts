@@ -73,7 +73,6 @@ export class TravelsService
       throw new NotFoundException("We couldn't find this travel");
     }
   
-
     this.logger.verbose(`User ${user.name} updated travel: ${id}. Data: ${JSON.stringify(update_travel_dto)}`);
     return travel;
   }
