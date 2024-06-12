@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { createUserDTO } from './dto/create-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { compare, hash } from 'bcrypt';
@@ -13,6 +13,8 @@ export class AuthService
 
   async create_user( create_user_dto: createUserDTO )
   {
+    await this.check_email_in_use( create_user_dto.email );
+
     const user = this.prisma.user.create({
       data: {
         ...create_user_dto,
@@ -47,5 +49,13 @@ export class AuthService
     throw new UnauthorizedException('Invalid credentials');
   }
 
-  
+  async check_email_in_use( email: string )
+  {
+    const user = await this.prisma.user.findUnique( { where: { email: email } } );
+
+    if ( user )
+    {
+      throw new ConflictException('Email already in use');
+    }
+  }
 }
