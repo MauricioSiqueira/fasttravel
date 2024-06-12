@@ -31,19 +31,33 @@ export class TravelsService
 
   async get_user_travels( user: JWTPayloadInterface, filter_dto: SearchTravelDTO )
   {
+    const { search, startDate, endDate } = filter_dto;
+
     const query: any = {
       userId: user.sub
     }
 
-    const filters = [];
-
-    if ( filter_dto.search )
+    if ( search )
     {
-      filters.push(
-        { description: { contains: filter_dto.search, mode: 'insensitive' } },
-        { name: { contains: filter_dto.search, mode: 'insensitive' } }
-      )
-      query.OR = filters;
+      query.OR = [
+        { description: { contains: search, mode: 'insensitive' } },
+        { name: { contains: search, mode: 'insensitive' } }
+      ]
+    }
+
+    if ( startDate || endDate )
+    {
+      query.AND = [];
+      
+      if ( startDate )
+      {
+        query.AND.push( { startDate: { gte: startDate } } );
+      }
+
+      if ( endDate )
+      {
+        query.AND.push( { endDate: { lte: endDate } } )
+      }
     }
 
     const travels = await this.prisma.travel.findMany({ 
