@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Patch, Post } from '@nestjs/common';
 import { GetUser } from 'src/auth/decorators/get_user.decorator';
 import { JWTPayloadInterface } from 'src/auth/entities/jwt-payload.interface';
 import { TravelsService } from './travels.service';
@@ -8,6 +8,7 @@ import { UpdateTravelDTO } from './dto/update-travel.dto';
 @Controller( '/travels' )
 export class TravelsController
 {
+  private logger = new Logger('TravelsController');
   constructor( private readonly travel_service: TravelsService ){}
 
   @Post()
@@ -19,12 +20,14 @@ export class TravelsController
   @Get()
   get_user_travels( @GetUser() user: JWTPayloadInterface )
   {
+    this.logger.verbose(`User ${user.name} requested own travels`);
     return this.travel_service.get_user_travels( user );
   }
 
   @Get( '/:id' )
   get_travel_detail( @GetUser() user: JWTPayloadInterface, @Param( 'id' ) id: string )
   {
+    this.logger.verbose(`User ${user.name} requested travel of id ${id}`);
     return this.travel_service.get_travel_by_id( user, id );
   }
 

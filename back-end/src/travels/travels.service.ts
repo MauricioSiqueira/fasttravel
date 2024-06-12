@@ -36,7 +36,6 @@ export class TravelsService
       select: { id: true, name:true, description: true, startDate: true, endDate: true } 
     });
 
-    this.logger.verbose(`User ${user.name} requested own travels`);
     return travels;
   }
 
@@ -52,7 +51,6 @@ export class TravelsService
       throw new NotFoundException(`We couldn't find your trip`);
     }
 
-    this.logger.verbose(`User ${user.name} requested travel of id ${id}`);
     return travel;
   }
 
