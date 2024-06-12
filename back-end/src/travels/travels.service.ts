@@ -31,14 +31,23 @@ export class TravelsService
 
   async get_user_travels( user: JWTPayloadInterface, filter_dto: SearchTravelDTO )
   {
+    const query: any = {
+      userId: user.sub
+    }
+
+    const filters = [];
+
+    if ( filter_dto.search )
+    {
+      filters.push(
+        { description: { contains: filter_dto.search, mode: 'insensitive' } },
+        { name: { contains: filter_dto.search, mode: 'insensitive' } }
+      )
+      query.OR = filters;
+    }
+
     const travels = await this.prisma.travel.findMany({ 
-      where: { 
-        userId: user.sub, 
-        OR: [
-          { description: { contains: filter_dto.search, mode: 'insensitive' } },
-          { name: { contains: filter_dto.search, mode: 'insensitive' } }
-        ]
-      },
+      where: query,
       select: { id: true, name:true, description: true, startDate: true, endDate: true } 
     });
 
