@@ -2,7 +2,6 @@ import { BadRequestException, Injectable, Logger, NotFoundException } from '@nes
 import { JWTPayloadInterface } from 'src/auth/entities/jwt-payload.interface';
 import { CreateTravelDTO } from './dto/create-travel.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { NotFoundError } from 'rxjs';
 import { UpdateTravelDTO } from './dto/update-travel.dto';
 
 @Injectable()
