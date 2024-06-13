@@ -1,4 +1,4 @@
-import { IsDateString, IsISO8601, IsOptional, IsString } from "class-validator";
+import { IsISO8601, IsOptional, IsString } from "class-validator";
 
 export class CreateTravelDTO
 {
