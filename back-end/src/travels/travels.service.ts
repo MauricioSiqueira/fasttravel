@@ -107,6 +107,18 @@ export class TravelsService
     return travel;
   }
 
+  async delete_travel( user: JWTPayloadInterface, id: string )
+  {
+    try
+    {
+      await this.prisma.travel.delete( { where: { userId: user.sub, id: id } } );
+    }
+    catch ( error )
+    {
+      throw new NotFoundException("Can't delete, travel not found");
+    }
+  }
+
   private check_valid_isodatetime( start_date: string )
   {
     const iso_datetime_regex = /^(\d{4})-(\d{2})-(\d{2})[T](\d{2}):(\d{2}):(\d{2})(\.\d+)?(Z|([+-]\d{2}:\d{2}))$/;

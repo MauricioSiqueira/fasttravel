@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Logger, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Logger, Param, Patch, Post, Query } from '@nestjs/common';
 import { GetUser } from 'src/auth/decorators/get_user.decorator';
 import { JWTPayloadInterface } from 'src/auth/entities/jwt-payload.interface';
 import { TravelsService } from './travels.service';
@@ -40,5 +40,14 @@ export class TravelsController
   )
   {
     return this.travel_service.update_travel( user, id, update_travel_dto );
+  }
+
+  @Delete( '/:id' )
+  delete_travel( 
+    @GetUser() user: JWTPayloadInterface, 
+    @Param( 'id' ) id: string
+  )
+  {
+    return this.travel_service.delete_travel( user, id );
   }
 }
