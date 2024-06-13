@@ -119,6 +119,7 @@ export class TravelsService
     }
   }
 
+  //TODO: transform this into a custom class validator and use in dto
   private check_valid_isodatetime( start_date: string )
   {
     const iso_datetime_regex = /^(\d{4})-(\d{2})-(\d{2})[T](\d{2}):(\d{2}):(\d{2})(\.\d+)?(Z|([+-]\d{2}:\d{2}))$/;
